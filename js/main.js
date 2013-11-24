@@ -97,10 +97,7 @@ function loadData(){
 			.datum(topojson.mesh(mn, mn.objects.counties, function(a, b) { return a === b; }))
 			.attr({
 				"id": "highlightPath",
-				"d": path,
-				"fill": "none",
-				"stroke-width": 3,
-				"stroke": "#0955c4"
+				"d": path
 			});
 		});
 	});
@@ -127,10 +124,7 @@ function toggleCounty(countyInfo){
 	.datum(topojson.mesh(countyJson, countyJson.objects.counties, function(a, b) { return a.properties.name == countyInfo.countyName || b.properties.name == countyInfo.countyName; }))
 	.attr({
 		"id": "highlightPath",
-		"d": path,
-		"fill": "none",
-		"stroke-width": 3,
-		"stroke": "#0955c4"
+		"d": path
 	});
 }
 
@@ -143,10 +137,7 @@ function toggleRegion(regionType){
 		.datum(topojson.mesh(countyJson, countyJson.objects.counties, function(a, b) { return a === b; }))
 		.attr({
 			"id": "highlightPath",
-			"d": path,
-			"fill": "none",
-			"stroke-width": 3,
-			"stroke": "#0955c4"
+			"d": path
 		});
 	}
 	else if (regionType == 'metro'){
@@ -161,10 +152,7 @@ function toggleRegion(regionType){
 				(bCounty.metro !== "" && aCounty === bCounty);  })) //or border between metro and outside
 		.attr({
 			"id": "highlightPath",
-			"d": path,
-			"fill": "none",
-			"stroke-width": 3,
-			"stroke": "#0955c4"
+			"d": path
 		});
 	}
 	else if (regionType == 'nonmetro'){
@@ -179,10 +167,7 @@ function toggleRegion(regionType){
 				(bCounty.metro === "" && aCounty === bCounty);  })) //or border between nonmetro and outside
 		.attr({
 			"id": "highlightPath",
-			"d": path,
-			"fill": "none",
-			"stroke-width": 3,
-			"stroke": "#0955c4"
+			"d": path
 		});
 	}
 	else  { //specific metro region
@@ -197,10 +182,7 @@ function toggleRegion(regionType){
 				(bCounty.metro === regionType && aCounty === bCounty);  })) //or border between nonmetro and outside
 		.attr({
 			"id": "highlightPath",
-			"d": path,
-			"fill": "none",
-			"stroke-width": 3,
-			"stroke": "#0955c4"
+			"d": path
 		});
 	}
 }

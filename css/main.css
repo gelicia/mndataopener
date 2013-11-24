@@ -138,3 +138,9 @@ select {
 .nonMetro {
 	fill: #9BBAE2;
 }
+
+#highlightPath {
+	fill: none;
+	stroke-width: 4;
+	stroke: #005bcf
+}

@@ -18,18 +18,19 @@
   </head> 
 
   <body onload="loadData();">
-   <h1>MN Data Opener</h1>
+   <h1>What Are Our High Schooler's Plans?</h1>
     <div id="left"></div>
     <div id="content">
       <div id="intro">
-        <p>The darker blue counties count as a Metropolitan Statistical Area as defined by the Census (<a href="http://www.census.gov/population/metro/data/def.html">source</a>). Data can be viewed by individual county, or by </p>
+        <p>When people discuss declining populations in rural Minnesota, one cause has said to be youth who graduate high school and leave for college. How do the percentages of students who plan to attend college differ between metro and non-metro areas?</p>
+        <p>The darker blue counties count as a Metropolitan Statistical Area as defined by the Census (<a href="http://www.census.gov/population/metro/data/def.html">source</a>). Data can be viewed by individual county, by a specific metropolitan region, or by all metropolitan or non-metropolitan regions.</p>
       </div>
       <div id="mapDiv">
         <svg id="mapMain"></svg>
       </div>
       <div id="countyInfo">
         <div id="dataToggle">
-          <input type="radio" name="displayOptions" value="state" onclick="toggleDisplay('state');" checked> Statewide <br/>
+          <input type="radio" name="displayOptions" value="state" onclick="toggleDisplay('state');" checked> By Region<br/>
             <select id="statewideOptions" onchange="getSelectToggleRegion();">
             </select> <br/>
           <input type="radio" name="displayOptions" value="county" onclick="toggleDisplay('county');"> By County <br/>
