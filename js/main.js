@@ -18,25 +18,24 @@ function getRadioVal (groupName){
 }
 
 var statewideOptionList = [
-	{condensedName: 'all', friendlyName: 'All Counties'},
+	{condensedName: 'all', friendlyName: 'State-wide'},
 	{condensedName: 'metro', friendlyName: 'All Metropolitan Counties'},
 	{condensedName: 'MinneapolisStPaulBloomingtonMNWI', friendlyName: 'Minneapolis-St. Paul-Bloomington MN-WI Metro Region'},
-	{condensedName: 'StCloudMN', friendlyName: 'St. Cloud MN Metro Region'},
-	{condensedName: 'MankatoNorthMankatoMN', friendlyName: 'Mankato-North Mankato MN Metro Region'},
-	{condensedName: 'DuluthMNWI', friendlyName: 'Duluth MN-WI Metro Region'},
-	{condensedName: 'FargoNDMN', friendlyName: 'Fargo ND-MN Metro Region'},
-	{condensedName: 'RochesterMN', friendlyName: 'Rochester MN Metro Region'},
-	{condensedName: 'LaCrosseOnalaskaWIMN', friendlyName: 'La Crosse-Onalaska WI-MN Metro Region'},
-	{condensedName: 'GrandForksNDMN', friendlyName: 'Grand Forks ND-MN Metro Region'},
+	{condensedName: 'StCloudMN', friendlyName: '    St. Cloud MN Metro Region'},
+	{condensedName: 'MankatoNorthMankatoMN', friendlyName: '    Mankato-North Mankato MN Metro Region'},
+	{condensedName: 'DuluthMNWI', friendlyName: '    Duluth MN-WI Metro Region'},
+	{condensedName: 'FargoNDMN', friendlyName: '    Fargo ND-MN Metro Region'},
+	{condensedName: 'RochesterMN', friendlyName: '    Rochester MN Metro Region'},
+	{condensedName: 'LaCrosseOnalaskaWIMN', friendlyName: '    La Crosse-Onalaska WI-MN Metro Region'},
+	{condensedName: 'GrandForksNDMN', friendlyName: '    Grand Forks ND-MN Metro Region'},
 	{condensedName: 'nonmetro', friendlyName: 'All Non-Metropolitan Counties'}
 ];
-
 
 var allCountyInfo = [];
 var countyJson = {};
 var width = 400,height = 430;
 
-//other functions use the projection/path for highlighting certain sections
+//other functions use the projection/path for highlighting certain sections of the map
 var projection = d3.geo.conicEqualArea()
 	.center([1.5, 46.5])
 	.rotate([95, 0])
@@ -116,8 +115,6 @@ function getSelectToggleRegion(){
 }
 
 function toggleCounty(countyInfo){
-	console.log(countyInfo);
-
 	d3.select("#highlightPath").remove();
 
 	d3.selectAll("svg#mapMain").append("path")
@@ -126,6 +123,8 @@ function toggleCounty(countyInfo){
 		"id": "highlightPath",
 		"d": path
 	});
+
+	displayCountyData(countyInfo);
 }
 
 function toggleRegion(regionType){
@@ -191,10 +190,24 @@ function toggleDisplay(displayType) {
 	if (displayType == 'state') {
 		document.getElementById('statewideOptions').disabled = false;
 		document.getElementById('countyOptions').disabled = true;
+		getSelectToggleRegion();
 	}
 	else { //displayType is county
 		document.getElementById('statewideOptions').disabled = true;
 		document.getElementById('countyOptions').disabled = false;
+		getSelectToggleCounty();
 	}
+}
+
+function displayCountyData(countyInfo){
+	d3.select("div#selectedTitle>h2").remove();
+	
+	d3.select("div#selectedTitle").append("h2").text(countyInfo.countyName);
 
 }
+
+function displayMetroRegionData(){}
+
+function displayMetroOrRuralData(){}
+
+function displayStateData(){}

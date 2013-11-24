@@ -23,7 +23,7 @@
     <div id="content">
       <div id="intro">
         <p>When people discuss declining populations in rural Minnesota, one cause has said to be youth who graduate high school and leave for college. How do the percentages of students who plan to attend college differ between metro and non-metro areas?</p>
-        <p>The darker blue counties count as a Metropolitan Statistical Area as defined by the Census (<a href="http://www.census.gov/population/metro/data/def.html">source</a>). Data can be viewed by individual county, by a specific metropolitan region, or by all metropolitan or non-metropolitan regions.</p>
+        <p>The darker blue counties count as a Metropolitan Statistical Area as defined by the Census (<a href="http://www.census.gov/population/metro/data/def.html">source</a>). Data can be viewed by individual county, by a specific metropolitan region, by all metropolitan or non-metropolitan counties grouped together, or state-wide.</p>
       </div>
       <div id="mapDiv">
         <svg id="mapMain"></svg>
@@ -37,12 +37,17 @@
             <select id="countyOptions" onchange="getSelectToggleCounty();" disabled>
             </select> <br/><br/>
           <input type="checkbox" name="cycle" value="cycle" id="cycleToggle"> Cycle every 30 seconds <br/> <br/>
-          
+        </div>
+        <div id="selectedData">
+          <div id="selectedTitle"></div>
+          <svg id="selectedChart"></svg>
+          <div id="selectedContent"></div>
         </div>
       </div>
     </div>
     <div class="footer">
-      <p>Created by Kristina Durivage for <a href="http://mndataopener.com/">MN Data Opener</a></p>
+      <p>Created by Kristina Durivage for <a href="http://mndataopener.com/">MN Data Opener</a>. Special thanks to Ann Kinney for my requests of non PDF data!</p>
+      <p>High schooler's plans to go to college were asked on the Minnesota Student Survey. The full results are available from the Department of Education <a href="http://w20.education.state.mn.us/MDEAnalytics/DataTopic.jsp?TOPICID=11">here</a> (pdf) and the results of selected questions are available from the Department of Health <a href="http://www.health.state.mn.us/divs/chs/mss/singleyr/index.html">here</a> (xlsx).</p>
     </div>
   </body>
 </html>
