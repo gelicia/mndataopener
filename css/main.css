@@ -91,6 +91,7 @@ select.drgSelect {
 #mapDiv {
 	float: left;
 	margin-top: 10px;
+	margin-bottom: 10px;
 	display: inline-block;
 }
 
@@ -102,11 +103,35 @@ select {
 	margin-left: 25px;
 }
 
-#cycleToggle {
-	margin-left: 25px;
+.MinneapolisStPaulBloomingtonMNWI{
+	fill: #5E98E2;
 }
 
-.metro {
+.StCloudMN{
+	fill: #5E98E2;
+}
+
+.MankatoNorthMankatoMN{
+	fill: #5E98E2;
+}
+
+.DuluthMNWI{
+	fill: #5E98E2;
+}
+
+.FargoNDMN{
+	fill: #5E98E2;
+}
+
+.RochesterMN{
+	fill: #5E98E2;
+}
+
+.LaCrosseOnalaskaWIMN{
+	fill: #5E98E2;
+}
+
+.GrandForksNDMN{
 	fill: #5E98E2;
 }
 

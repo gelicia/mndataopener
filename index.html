@@ -22,7 +22,7 @@
     <div id="left"></div>
     <div id="content">
       <div id="intro">
-        <p>Insert text about stuff here.</p>
+        <p>The darker blue counties count as a Metropolitan Statistical Area as defined by the Census (<a href="http://www.census.gov/population/metro/data/def.html">source</a>). Data can be viewed by individual county, or by </p>
       </div>
       <div id="mapDiv">
         <svg id="mapMain"></svg>
@@ -30,15 +30,12 @@
       <div id="countyInfo">
         <div id="dataToggle">
           <input type="radio" name="displayOptions" value="state" onclick="toggleDisplay('state');" checked> Statewide <br/>
-            <select id="statewideOptions" onchange="toggleRegion();">
-              <option value='all'>All</option>
-              <option value='metro'>Twin Cities Metro Counties</option>
-              <option value='nonmetro'>Non Metro Counties</option>
+            <select id="statewideOptions" onchange="getSelectToggleRegion();">
             </select> <br/>
-            <input type="checkbox" name="cycle" value="cycle" id="cycleToggle"> Cycle every 30 seconds <br/> <br/>
           <input type="radio" name="displayOptions" value="county" onclick="toggleDisplay('county');"> By County <br/>
             <select id="countyOptions" onchange="getSelectToggleCounty();" disabled>
-            </select> <br/>
+            </select> <br/><br/>
+          <input type="checkbox" name="cycle" value="cycle" id="cycleToggle"> Cycle every 30 seconds <br/> <br/>
           
         </div>
       </div>
