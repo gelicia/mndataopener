@@ -1,3 +1,13 @@
+//Check if info exists, by school number
+Array.prototype.returnCountyInfo = function(county){
+        for (var i = 0; i < this.length; i++) {
+                if (this[i].countyName == county){
+                        return this[i];
+                }
+        }
+        return undefined;
+};
+
 function loadData(){
 var width = 400,
     height = 430;
@@ -16,13 +26,21 @@ var projection = d3.geo.conicEqualArea()
 var path = d3.geo.path()
     .projection(projection);
 
-	d3.json("data/mncounties.json", function(error, mn) {
-		svg.append("path")
-	    .datum(topojson.feature(mn, mn.objects.counties))
-	    .attr("d", path)
-	    .attr({
-	    	fill: '#fff',
-	    	stroke: '#000'
-	    });
+	d3.json("data/mncounties.json", function(errorJ, mn) {
+		d3.csv("data/ruralPostSecondary.csv", function(errorC, studentData){
+			console.log(mn);
+
+			svg.selectAll(".county")
+			.data(topojson.feature(mn, mn.objects.counties).features).enter().append("path")
+			.attr({
+				d: path,
+				fill: function(d, i){ 
+					var countyData = studentData.returnCountyInfo(d.properties.name);
+					return countyData == undefined ? "#696969" : "#ff0000";
+				},
+				stroke: '#000'
+			})
+			.classed('county', true);
+		});
 	});
 }
