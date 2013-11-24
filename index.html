@@ -24,7 +24,24 @@
       <div id="intro">
         <p>Insert text about stuff here.</p>
       </div>
-      <svg id="mapMain"></svg>
+      <div id="mapDiv">
+        <svg id="mapMain"></svg>
+      </div>
+      <div id="countyInfo">
+        <div id="dataToggle">
+          <input type="radio" name="group1" value="state" checked> Statewide <br/>
+            <select id="statewideOptions">
+              <option>All</option>
+              <option>Twin Cities Metro Counties</option>
+              <option>Non Metro Counties</option>
+            </select> <br/>
+            <input type="checkbox" name="cycle" value="cycle" id="cycleToggle"> Cycle every 30 seconds <br/>
+          <input type="radio" name="group1" value="county"> By County <br/>
+            <select id="countyOptions">
+            </select> <br/>
+          
+        </div>
+      </div>
     </div>
     <div class="footer">
       <p>Created by Kristina Durivage for <a href="http://mndataopener.com/">MN Data Opener</a></p>

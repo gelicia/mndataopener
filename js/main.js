@@ -27,19 +27,25 @@ var path = d3.geo.path()
     .projection(projection);
 
 	d3.json("data/mncounties.json", function(errorJ, mn) {
+		//in a separate variable so we can sort them easily
+		var countyList = mn.objects.counties.geometries.map(function(d){return d.properties.name;}).sort();
+
+		d3.select("select#countyOptions").selectAll('option').data(countyList).enter()
+			.append("option").text(function(d){return d;});
+
 		d3.csv("data/ruralPostSecondary.csv", function(errorC, studentData){
 			svg.selectAll(".county")
 			.data(topojson.feature(mn, mn.objects.counties).features).enter().append("path")
 			.attr({
 				d: path,
-				fill: function(d, i){ 
+				id: function(d) {return d.properties.name;},
+				stroke: '#000',
+				'class' : function(d){
 					var countyData = studentData.returnCountyInfo(d.properties.name);
-					console.log(countyData);
-					return countyData.metroYear === "" ? "#696969" : "#ff0000";
-				},
-				stroke: '#000'
-			})
-			.classed('county', true);
+					return 'county ' + (countyData.metroYear === "" ? 'nonMetro' : 'metro');} 
+			});
 		});
 	});
 }
+
+function toggle() {}
