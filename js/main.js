@@ -28,15 +28,14 @@ var path = d3.geo.path()
 
 	d3.json("data/mncounties.json", function(errorJ, mn) {
 		d3.csv("data/ruralPostSecondary.csv", function(errorC, studentData){
-			console.log(mn);
-
 			svg.selectAll(".county")
 			.data(topojson.feature(mn, mn.objects.counties).features).enter().append("path")
 			.attr({
 				d: path,
 				fill: function(d, i){ 
 					var countyData = studentData.returnCountyInfo(d.properties.name);
-					return countyData == undefined ? "#696969" : "#ff0000";
+					console.log(countyData);
+					return countyData.metroYear === "" ? "#696969" : "#ff0000";
 				},
 				stroke: '#000'
 			})
