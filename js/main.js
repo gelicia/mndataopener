@@ -135,7 +135,7 @@ function loadData(){
 					"d": path
 				});
 
-				displayStateData();
+				getSelectToggleCounty();
 			});
 		});
 	});
@@ -374,14 +374,18 @@ function displayCountyData(countyInfo){
 }
 
 function displayMetroRegionData(regionName){
-
 	var longRegionName = _.find(statewideOptionList, function(d){ return d.condensedName == regionName;}).friendlyName;
+	var regionData = _.find(allRegionInfo, function(d){ return d.regionName == regionName;});
 
 	d3.select("div#selectedTitle>h2").remove();
 	d3.selectAll("div#selectedContent>p").remove();
 	d3.selectAll("svg#selectedChart>g").remove();
 
 	d3.select("div#selectedTitle").append("h2").text(longRegionName);
+
+	var content = d3.select("div#selectedContent");
+
+	content.append("p").text("This region is ranked " + regionData.regionRank + "/8 for having " + Math.floor(regionData.collOrByond) + "% of students interested in going to college or beyond.");
 }
 
 function displayMetroOrRuralData(isMetro){
@@ -427,12 +431,23 @@ window.setInterval(function(){
 function selectRandom(){
 	var displayType = getCheckedRadio('displayOptions');
 	
-	if(displayType == 'state'){
+/*
+var countyElement = document.getElementById('countyOptions');
+						countyElement.value = d.properties.name;
+*/
 
+	if(displayType == 'state'){
+		var newIdxState = getRandomInt(0, statewideOptionList.length-1);
+		var toggledValueState = statewideOptionList[newIdxState].condensedName;
+		document.getElementById('statewideOptions').value = toggledValueState;
+		toggleRegion(toggledValueState);
+		
 	}
 	else { //displayType == county
-		var newIdx = getRandomInt(0, allCountyInfo.length-1);
-		toggleCounty(allCountyInfo[newIdx]);
+		var newIdxCounty = getRandomInt(0, statewideOptionList.length-1);
+		var toggledCountyInfo = allCountyInfo[newIdxCounty];
+		document.getElementById('countyOptions').value = toggledCountyInfo.countyName;
+		toggleCounty(allCountyInfo[newIdxCounty]);
 	}
 }
 

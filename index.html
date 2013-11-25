@@ -31,11 +31,11 @@
       </div>
       <div id="countyInfo">
         <div id="dataToggle">
-          <input type="radio" name="displayOptions" value="state" onclick="toggleDisplay('state');" checked> By Region<br/>
-            <select id="statewideOptions" onchange="getSelectToggleRegion();">
+          <input type="radio" name="displayOptions" value="state" onclick="toggleDisplay('state');"> By Region<br/>
+            <select id="statewideOptions" onchange="getSelectToggleRegion();" disabled>
             </select> <br/>
-          <input type="radio" name="displayOptions" value="county" onclick="toggleDisplay('county');"> By County <br/>
-            <select id="countyOptions" onchange="getSelectToggleCounty();" disabled>
+          <input type="radio" name="displayOptions" value="county" onclick="toggleDisplay('county');" checked> By County <br/>
+            <select id="countyOptions" onchange="getSelectToggleCounty();" >
             </select> <br/><br/>
           <input type="checkbox" name="cycle" value="cycle" id="cycleToggle"> Cycle every 10 seconds <br/> <br/>
         </div>
