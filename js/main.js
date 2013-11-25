@@ -17,6 +17,33 @@ function getRadioVal (groupName){
 	}
 }
 
+function countyObj(countyInfo){
+  var outArr = [];
+  var popArr = [];
+  var collArr = [];
+  
+  for(var prop in countyInfo){
+    if (typeof countyInfo[prop] === 'string'){
+      if (prop == 'countyName'){
+        outArr.countyName = countyInfo[prop];
+      } 
+      else if (prop == 'metro'){
+        outArr.metro = countyInfo[prop];
+      }
+      else if (prop.substring(0,3) == 'pop'){
+        popArr[prop.substring(4)] = Number(countyInfo[prop]);
+      }  
+      else if (prop.substring(0,11) == 'collOrByond'){
+        collArr[prop.substring(12)] = (Number(countyInfo[prop]) / 100) * popArr[prop.substring(12)];
+      }     
+    }  
+  } 
+  
+  outArr.populations = popArr;
+  outArr.collegeAmt = collArr;
+  return outArr;   
+} 
+
 var statewideOptionList = [
 	{condensedName: 'all', friendlyName: 'State-wide'},
 	{condensedName: 'metro', friendlyName: 'All Metropolitan Counties'},
@@ -33,6 +60,11 @@ var statewideOptionList = [
 
 var allCountyInfo = [];
 var countyJson = {};
+
+var parseDate = d3.time.format("%Y");
+var years = ["1998","2001","2004","2007","2010"];
+years = years.map(function(d){return parseDate.parse(d);});
+
 var width = 400,height = 430;
 
 //other functions use the projection/path for highlighting certain sections of the map
@@ -53,11 +85,12 @@ function loadData(){
 
 	d3.json("data/mncounties.json", function(errorJ, mn) {
 		countyJson=mn;
-		d3.csv("data/ruralPostSecondary.csv", function(errorC, studentData){
+		d3.csv("data/ruralPostSecondary-condensed.csv", function(errorC, studentData){
 			allCountyInfo = studentData;
 
 			//build the county list in a separate variable so we can sort them easily
-			var countyList = studentData.map(function(d){return d.countyName;}).sort();
+			//remove the last element, which is statewide
+			var countyList = studentData.map(function(d){return d.countyName;}).slice(0, -1).sort();
 			d3.select("select#countyOptions").selectAll('option').data(countyList).enter()
 			.append("option").attr("value", function(d){return d;}).text(function(d){return d;});
 
@@ -128,7 +161,6 @@ function toggleCounty(countyInfo){
 }
 
 function toggleRegion(regionType){
-	console.log(regionType);
 	d3.select("#highlightPath").remove();
 
 	if (regionType == 'all'){
@@ -200,10 +232,131 @@ function toggleDisplay(displayType) {
 }
 
 function displayCountyData(countyInfo){
-	d3.select("div#selectedTitle>h2").remove();
-	
-	d3.select("div#selectedTitle").append("h2").text(countyInfo.countyName);
+	var margin = {top: 20, right: 20, bottom: 30, left: 78},
+    thisWidth = 348 - margin.left - margin.right,
+    thisHeight = 204 - margin.top - margin.bottom;
 
+	var chartInfo = countyObj(countyInfo);
+
+	d3.select("div#selectedTitle>h2").remove();
+	d3.selectAll("div#selectedContent>p").remove();
+	d3.selectAll("svg#selectedChart>g").remove();
+
+	d3.select("div#selectedTitle").append("h2").text(countyInfo.countyName);
+	var content = d3.select("div#selectedContent");
+
+	content.append("p").text(function(d){
+		if (countyInfo.metro === "") {
+			return "Not classified as a metropolitan county.";
+		}
+		else {
+			return _.find(statewideOptionList, function(d){ return d.condensedName == countyInfo.metro;}).friendlyName;
+		}
+	});
+
+	content.append("p").text("Ranks " + countyInfo.rank + "/87 for number of students who plan to go to college or beyond.");
+
+	var svgChart = d3.select("svg#selectedChart").append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	var x = d3.time.scale()
+		.range([0, thisWidth])
+		.domain(d3.extent(years));
+
+	var y = d3.scale.linear()
+		.range([thisHeight, 0])
+		.domain([0, d3.max(chartInfo.populations, function(d,i) {return d; })]);
+
+	var xAxis = d3.svg.axis()
+		.scale(x)
+		.tickValues(years)
+		.orient("bottom"); 
+
+	var yAxis = d3.svg.axis()
+		.scale(y)
+		.orient("left");
+
+	var popArea = d3.svg.area()
+		.x(function(d,i) { return x(years[i]); })
+		.y0(thisHeight)
+		.y1(function(d) {return y(chartInfo.populations[d.getFullYear()]); });
+
+	var schoolArea = d3.svg.area()
+		.x(function(d,i) { return x(years[i]); })
+		.y0(thisHeight)
+		.y1(function(d) { return y(chartInfo.collegeAmt[d.getFullYear()]); });
+
+	var stateAvgLine = d3.svg.line()
+	.x(function(d,i) { return x(years[i]); })
+    .y(function(d) { 
+      var population = chartInfo.populations[d.getFullYear()];
+      var stateInfo = allCountyInfo[allCountyInfo.length-1]; 
+      return y((stateInfo['collOrByond-'+d.getFullYear()]/100) * population); 
+    });  
+
+	svgChart.append("path")
+		.datum(years) 
+		.attr("class", "popArea")
+		.attr("d", popArea);
+
+	svgChart.append("path")
+      .datum(years)
+      .attr("class", "schoolArea")
+      .attr("d", schoolArea);
+
+	svgChart.append("path")
+      .datum(years)
+      .attr("class", "stateLine")
+      .attr("d", stateAvgLine);
+
+	svgChart.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + thisHeight + ")")
+      .call(xAxis);
+
+	svgChart.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+	var index = svgChart.append("g")
+	.attr("transform", "translate(0," + 179 + ")");
+
+	index.append("rect")
+	.attr({
+      height: 20,
+      width: 20,
+      'class': 'popArea'
+	});
+
+	index.append("rect")
+	.attr({
+      y: 25,
+      height: 20,
+      width: 20,
+      'class': 'schoolArea'
+	});
+
+	index.append("path")
+	.attr({
+      d : "M0,50L22,50",
+      "transform": "translate(0," + 11 + ")",
+      'class': 'stateLine'
+	});
+
+	index.append("text").attr({
+      x: 25,
+      y: 16
+	}).text("Students Surveyed");
+
+	index.append("text").attr({
+      x: 25,
+      y: 41
+	}).text("Students Planning on Going to College or Beyond");
+
+	index.append("text").attr({
+      x: 25,
+      y: 66
+	}).text("State Avg % of Students Planning on Going to College or Beyond");
 }
 
 function displayMetroRegionData(){}
@@ -211,3 +364,36 @@ function displayMetroRegionData(){}
 function displayMetroOrRuralData(){}
 
 function displayStateData(){}
+
+window.setInterval(function(){
+  if(document.getElementById('cycleToggle').checked){
+	selectRandom();
+  }
+}, 10000);
+
+function selectRandom(){
+	var displayType = getCheckedRadio('displayOptions');
+	
+	if(displayType == 'state'){
+
+	}
+	else { //displayType == county
+		var newIdx = getRandomInt(0, allCountyInfo.length-1);
+		toggleCounty(allCountyInfo[newIdx]);
+	}
+}
+
+function getCheckedRadio(groupName) {
+	var radio_group = document.getElementsByName(groupName);
+    for (var i = 0; i < radio_group.length; i++) {
+        var button = radio_group[i];
+        if (button.checked) {
+            return button.value;
+        }
+    }
+    return undefined;
+}
+
+function getRandomInt (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

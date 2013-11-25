@@ -144,3 +144,29 @@ select {
 	stroke-width: 4;
 	stroke: #005bcf
 }
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+text{
+	font-size:12px
+}
+
+.popArea {
+  fill: #007AFF;
+}
+
+.schoolArea {
+  fill: #1750CA;
+}
+
+.stateLine {
+  fill: none;
+  stroke: #FFFF00;
+  stroke-width: 3;
+  stroke-dasharray: 5,5;
+}
