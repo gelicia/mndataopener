@@ -8,15 +8,6 @@ Array.prototype.returnCountyInfo = function(county){
 		return undefined;
 };
 
-function getRadioVal (groupName){
-	var radioElements = document.getElementsByName(groupName);
-	for(var i = 0; i < radioElements.length; i++){
-		if(radioElements[i].checked){
-			return radioElements[i].value;
-		}
-	}
-}
-
 function countyObj(countyInfo){
   var outArr = [];
   var popArr = [];
@@ -429,12 +420,7 @@ window.setInterval(function(){
 }, 10000);
 
 function selectRandom(){
-	var displayType = getCheckedRadio('displayOptions');
-	
-/*
-var countyElement = document.getElementById('countyOptions');
-						countyElement.value = d.properties.name;
-*/
+	var displayType = getRadioVal('displayOptions');
 
 	if(displayType == 'state'){
 		var newIdxState = getRandomInt(0, statewideOptionList.length-1);
@@ -447,20 +433,17 @@ var countyElement = document.getElementById('countyOptions');
 		var newIdxCounty = getRandomInt(0, allCountyInfo.length-1);
 		var toggledCountyInfo = allCountyInfo[newIdxCounty];
 		document.getElementById('countyOptions').value = toggledCountyInfo.countyName;
-		toggleCounty(allCountyInfo[newIdxCounty]);
+		toggleCounty(toggledCountyInfo);
 	}
 }
 
-//in full blown "use utility functions on stack overflow" mode
-function getCheckedRadio(groupName) {
-	var radio_group = document.getElementsByName(groupName);
-    for (var i = 0; i < radio_group.length; i++) {
-        var button = radio_group[i];
-        if (button.checked) {
-            return button.value;
-        }
-    }
-    return undefined;
+function getRadioVal (groupName){
+	var radioElements = document.getElementsByName(groupName);
+	for(var i = 0; i < radioElements.length; i++){
+		if(radioElements[i].checked){
+			return radioElements[i].value;
+		}
+	}
 }
 
 function getRandomInt (min, max) {
