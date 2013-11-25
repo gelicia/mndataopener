@@ -59,6 +59,7 @@ var statewideOptionList = [
 ];
 
 var allCountyInfo = [];
+var allRegionInfo = [];
 var countyJson = {};
 
 var parseDate = d3.time.format("%Y");
@@ -85,51 +86,56 @@ function loadData(){
 
 	d3.json("data/mncounties.json", function(errorJ, mn) {
 		countyJson=mn;
-		d3.csv("data/ruralPostSecondary-condensed.csv", function(errorC, studentData){
-			allCountyInfo = studentData;
+		d3.csv("data/regionData.csv", function(errorC, regionData){
+			allRegionInfo=regionData;
+			d3.csv("data/ruralPostSecondary-condensed.csv", function(errorC, studentData){
+				allCountyInfo = studentData;
 
-			//build the county list in a separate variable so we can sort them easily
-			//remove the last element, which is statewide
-			var countyList = studentData.map(function(d){return d.countyName;}).slice(0, -1).sort();
-			d3.select("select#countyOptions").selectAll('option').data(countyList).enter()
-			.append("option").attr("value", function(d){return d;}).text(function(d){return d;});
+				//build the county list in a separate variable so we can sort them easily
+				//remove the last element, which is statewide
+				var countyList = studentData.map(function(d){return d.countyName;}).slice(0, -1).sort();
+				d3.select("select#countyOptions").selectAll('option').data(countyList).enter()
+				.append("option").attr("value", function(d){return d;}).text(function(d){return d;});
 
-			//build the metro area list
-			d3.select("select#statewideOptions").selectAll('option').data(statewideOptionList).enter()
-			.append("option").attr("value", function(d){return d.condensedName;}).text(function(d){return d.friendlyName;});
+				//build the metro area list
+				d3.select("select#statewideOptions").selectAll('option').data(statewideOptionList).enter()
+				.append("option").attr("value", function(d){return d.condensedName;}).text(function(d){return d.friendlyName;});
 
-			svg.selectAll(".county")
-			.data(topojson.feature(mn, mn.objects.counties).features).enter().append("path")
-			.attr({
-				d: path,
-				id: function(d) {return d.properties.name;},
-				stroke: '#000',
-				'class' : function(d){
-					var countyData = studentData.returnCountyInfo(d.properties.name);
-					return 'county ' + (countyData.metro === "" ? 'nonMetro' : countyData.metro );} 
-			})
-			.on('click', function(d){
-				var clickedCounty = studentData.returnCountyInfo(d.properties.name);
-				//what happens when clicked depends on the selection option
-				var displayOption = getRadioVal('displayOptions');
-				if (displayOption == 'state'){
-					var region = clickedCounty.metro === "" ? 'nonmetro' : clickedCounty.metro;
-					var stateElement = document.getElementById('statewideOptions');
-					stateElement.value = region;
-					toggleRegion(region);
-				}
-				else { //by county
-					var countyElement = document.getElementById('countyOptions');
-					countyElement.value = d.properties.name;
-					toggleCounty(clickedCounty);
-				}
-			});
+				svg.selectAll(".county")
+				.data(topojson.feature(mn, mn.objects.counties).features).enter().append("path")
+				.attr({
+					d: path,
+					id: function(d) {return d.properties.name;},
+					stroke: '#000',
+					'class' : function(d){
+						var countyData = studentData.returnCountyInfo(d.properties.name);
+						return 'county ' + (countyData.metro === "" ? 'nonMetro' : countyData.metro );} 
+				})
+				.on('click', function(d){
+					var clickedCounty = studentData.returnCountyInfo(d.properties.name);
+					//what happens when clicked depends on the selection option
+					var displayOption = getRadioVal('displayOptions');
+					if (displayOption == 'state'){
+						var region = clickedCounty.metro === "" ? 'nonmetro' : clickedCounty.metro;
+						var stateElement = document.getElementById('statewideOptions');
+						stateElement.value = region;
+						toggleRegion(region);
+					}
+					else { //by county
+						var countyElement = document.getElementById('countyOptions');
+						countyElement.value = d.properties.name;
+						toggleCounty(clickedCounty);
+					}
+				});
 
-			svg.append("path")
-			.datum(topojson.mesh(mn, mn.objects.counties, function(a, b) { return a === b; }))
-			.attr({
-				"id": "highlightPath",
-				"d": path
+				svg.append("path")
+				.datum(topojson.mesh(mn, mn.objects.counties, function(a, b) { return a === b; }))
+				.attr({
+					"id": "highlightPath",
+					"d": path
+				});
+
+				displayStateData();
 			});
 		});
 	});
@@ -170,6 +176,8 @@ function toggleRegion(regionType){
 			"id": "highlightPath",
 			"d": path
 		});
+
+		displayStateData();
 	}
 	else if (regionType == 'metro'){
 		d3.selectAll("svg#mapMain").append("path")
@@ -185,6 +193,8 @@ function toggleRegion(regionType){
 			"id": "highlightPath",
 			"d": path
 		});
+
+		displayMetroOrRuralData(true);
 	}
 	else if (regionType == 'nonmetro'){
 		d3.selectAll("svg#mapMain").append("path")
@@ -200,6 +210,8 @@ function toggleRegion(regionType){
 			"id": "highlightPath",
 			"d": path
 		});
+
+		displayMetroOrRuralData(false);
 	}
 	else  { //specific metro region
 		d3.selectAll("svg#mapMain").append("path")
@@ -215,6 +227,8 @@ function toggleRegion(regionType){
 			"id": "highlightPath",
 			"d": path
 		});
+
+		displayMetroRegionData(regionType);
 	}
 }
 
@@ -290,7 +304,7 @@ function displayCountyData(countyInfo){
 	.x(function(d,i) { return x(years[i]); })
     .y(function(d) { 
       var population = chartInfo.populations[d.getFullYear()];
-      var stateInfo = allCountyInfo[allCountyInfo.length-1]; 
+      var stateInfo = _.find(allCountyInfo, function(d){return d.countyName == 'Statewide';});
       return y((stateInfo['collOrByond-'+d.getFullYear()]/100) * population); 
     });  
 
@@ -359,11 +373,50 @@ function displayCountyData(countyInfo){
 	}).text("State Avg % of Students Planning on Going to College or Beyond");
 }
 
-function displayMetroRegionData(){}
+function displayMetroRegionData(regionName){
 
-function displayMetroOrRuralData(){}
+	var longRegionName = _.find(statewideOptionList, function(d){ return d.condensedName == regionName;}).friendlyName;
 
-function displayStateData(){}
+	d3.select("div#selectedTitle>h2").remove();
+	d3.selectAll("div#selectedContent>p").remove();
+	d3.selectAll("svg#selectedChart>g").remove();
+
+	d3.select("div#selectedTitle").append("h2").text(longRegionName);
+}
+
+function displayMetroOrRuralData(isMetro){
+	var metroDataPct = Math.floor(_.find(allRegionInfo, function(d){if (d.regionName == 'Metro')  { return d;}}).collOrByond);
+	var nonMetroDataPct = Math.floor(_.find(allRegionInfo, function(d){if (d.regionName == 'NonMetro')  { return d;}}).collOrByond);
+
+	d3.select("div#selectedTitle>h2").remove();
+	d3.selectAll("div#selectedContent>p").remove();
+	d3.selectAll("svg#selectedChart>g").remove();
+
+	d3.select("div#selectedTitle").append("h2").text(function(){return isMetro ? "All Metropolitan Regions" : "All Non-Metropolitan Regions";});
+	var content = d3.select("div#selectedContent");
+	content.append("p").text((isMetro ? "Metro" : "Non-Metro") + " regions had an average of " + (isMetro? metroDataPct : nonMetroDataPct)+ "% of students express interest in attending college or beyond.");
+
+	var difference = isMetro? metroDataPct - nonMetroDataPct : nonMetroDataPct - metroDataPct;
+	var compareWord = difference > 0 ? "more" : "less";
+	difference = Math.abs(difference); //todo the same as
+	content.append("p").text("This is " + difference + "% " + compareWord + " than " + (isMetro ? "non-metro" : "metro") + " regions.");
+}
+
+function displayStateData(){
+	var stateInfo = _.find(allCountyInfo, function(d){return d.countyName == 'Statewide';});
+
+	d3.select("div#selectedTitle>h2").remove();
+	d3.selectAll("div#selectedContent>p").remove();
+	d3.selectAll("svg#selectedChart>g").remove();
+
+	d3.select("div#selectedTitle").append("h2").text("Minnesota");
+	var content = d3.select("div#selectedContent");
+
+	var avgStudents = d3.mean([stateInfo['pop-1998'], stateInfo['pop-2001'], stateInfo['pop-2004'], stateInfo['pop-2007'], stateInfo['pop-2010']]);
+	var avgPct = d3.mean([stateInfo['collOrByond-1998'], stateInfo['collOrByond-2001'], stateInfo['collOrByond-2004'], stateInfo['collOrByond-2007'], stateInfo['collOrByond-2010']]);
+	content.append("p").text("On average, " + Math.floor(avgStudents)+ " students were surveyed a year.");
+	content.append("p").text("Of those students, on average " + Math.floor(avgPct) + "% planned to go to college or beyond.");
+}
 
 window.setInterval(function(){
   if(document.getElementById('cycleToggle').checked){
@@ -383,6 +436,7 @@ function selectRandom(){
 	}
 }
 
+//in full blown "use utility functions on stack overflow" mode
 function getCheckedRadio(groupName) {
 	var radio_group = document.getElementsByName(groupName);
     for (var i = 0; i < radio_group.length; i++) {
