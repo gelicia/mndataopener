@@ -444,7 +444,7 @@ var countyElement = document.getElementById('countyOptions');
 		
 	}
 	else { //displayType == county
-		var newIdxCounty = getRandomInt(0, statewideOptionList.length-1);
+		var newIdxCounty = getRandomInt(0, allCountyInfo.length-1);
 		var toggledCountyInfo = allCountyInfo[newIdxCounty];
 		document.getElementById('countyOptions').value = toggledCountyInfo.countyName;
 		toggleCounty(allCountyInfo[newIdxCounty]);
