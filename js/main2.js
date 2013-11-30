@@ -18,10 +18,12 @@ function loadData(){
 
 	d3.json("data/mncounties.json", function(errorJ, mn) {
 		d3.csv("data/ruralPostSecondary-condensed.csv", function(errorC, countyData){
-			var countyExtent = d3.extent(countyData, function(d){return Number(d.rank);});
+			//var countyExtent = d3.extent(countyData, function(d){return Number(d.rank);});
+			var countyExtent = d3.extent(countyData, function(d){return Number(d.collOrByond) === 0 ? undefined : Number(d.collOrByond);});
+			console.log(countyExtent);
 
 			var colorScale = d3.scale.linear()
-			.range(['#005BCF', '#fff'])
+			.range(['#fff', '#005BCF'])
 			.domain(countyExtent);
 
 			svg.selectAll(".county")
@@ -30,8 +32,9 @@ function loadData(){
 				d: path,
 				id: function(d) {return d.properties.name;},
 				stroke: '#000',
-				fill: function(d) { return colorScale(_.find(countyData, function(d2){return d2.countyName == d.properties.name;}).rank);} //return colorScale(d.rank);}
-			});
+				fill: function(d) { return colorScale(Number(_.find(countyData, function(d2){return d2.countyName == d.properties.name;}).collOrByond));} //return colorScale(d.rank);}
+			})
+			.on('click', function(d){ console.log(d.properties.name + " - " + (_.find(countyData, function(d2){return d2.countyName == d.properties.name;}).collOrByond));});
 		});
 	});
 }
